@@ -70,7 +70,7 @@ function startPrompt() {
                 addDepartment();
                 break;
             case "Add Role":
-                AddRoles();
+                addRole();
                 break;
             case "Add employee":
                 addEmployee();
@@ -181,14 +181,39 @@ addEmployee = () => {
             if (err) throw err
             console.table(answer)
             startPrompt()
-            console.log('A new employee has been added to the database!')
+            
         })
     })
 }
 
-//================================================================//
+//=========================ADD A ROLE TO THE DATABASE=============================//
 
-
+addRole = () => {
+    inquirer.prompt([
+        {
+            name:'title',
+            type:'input',
+            message:'what is the name of the new role?',
+        },
+        {
+            name:'salary',
+            type:'input',
+            message:'what is the salary of this role?',
+        }
+    ]).then(function(res) {
+        connection.query('INSERT INTO role SET ?', 
+        {
+            title: res.title,
+            salary: res.salary,
+            
+        },
+        function(err) {
+            if(err) throw err
+            console.table(res)
+            startPrompt()
+        })
+    })
+}
 
 
 
