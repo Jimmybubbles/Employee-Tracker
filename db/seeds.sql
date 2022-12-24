@@ -8,7 +8,8 @@ VALUES
     ('Legal');
 
 -- insert names of roles salary and department id
-INSERT INTO roles
+
+INSERT INTO role
     (title, salary, department_id)
 VALUES
     ('Sales person', 100000, 1),
@@ -20,7 +21,10 @@ VALUES
 INSERT INTO employee
     (first_name, last_name, role_id, manager_id)
 VALUES
-    ('Tom', 'Cruise', 1, 4),
+    ('Tom', 'Cruise', 1, 2),
     ('Billy', 'Crystal', 2, 3),
     ('Sam', 'Brown', 3, 1),
-    ('Sarah', 'Mendosa', 4, 2);
+    ('Billy', 'Bob', 4, 2),
+    ('John' , 'Smith', 4, NULL),
+    ('Craig', 'David', 4, NULL),
+    ('Sarah', 'Mendosa', 4, NULL);
