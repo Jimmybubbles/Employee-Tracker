@@ -18,19 +18,19 @@ connection.connect(err => {
     if (err) throw err;
     console.log('connected as id ' + connection.threadId);
     // programName();
-    startPrompt()
+    programName()
 });
 
 //========== initial view on console =============//
 
-// programName = () => {
-//     console.log("***********************************")
-//     console.log("*                                 *")
-//     console.log("*        EMPLOYEE MANAGER         *")
-//     console.log("*                                 *")
-//     console.log("***********************************")
-//     startPrompt()
-// };
+programName = () => {
+    console.log("***********************************")
+    console.log("*                                 *")
+    console.log("*        EMPLOYEE MANAGER         *")
+    console.log("*                                 *")
+    console.log("***********************************")
+    startPrompt()
+};
 
 // =============== user prompt =====================//
 // user prompt to show the inquirer choices in list form
@@ -91,16 +91,16 @@ function startPrompt() {
 //=================VIEW QUERIES TO FIRST 3 CHOICES===================//
 
 viewDepartment = () => {
-    connection.query('SELECT * FROM department', (err, answer) => {
-        if(err) throw err,
-        console.table(answer)
+    connection.query("SELECT * FROM department", (err, res) => {
+        if(err) throw err
+        console.table(res)
         startPrompt()
     })
 }
 
 viewRole = () => {
     connection.query('SELECT * FROM role', (err, res) => {
-        if(err) throw err,
+        if(err) throw err
         console.table(res)
         startPrompt()
     })
@@ -108,7 +108,7 @@ viewRole = () => {
 
 viewEmployee = () => {
     connection.query('SELECT * FROM employee', (err, res) => {
-        if(err) throw err,
+        if(err) throw err
         console.table(res)
         startPrompt()
     })
@@ -179,6 +179,7 @@ addEmployee = () => {
         
         }, function(err){
             if (err) throw err
+            console.log('New employee added to the database! \n')
             console.table(answer)
             startPrompt()
             
@@ -199,12 +200,14 @@ addRole = () => {
             name:'salary',
             type:'input',
             message:'what is the salary of this role?',
-        }
+        },
+
     ]).then(function(res) {
         connection.query('INSERT INTO role SET ?', 
         {
-            title: res.title,
+            title: res.title.trim(),
             salary: res.salary,
+            
             
         },
         function(err) {
@@ -216,16 +219,51 @@ addRole = () => {
 }
 
 
+//=========================UPDATE EMPLOYEE WITH LAST NAME=============================//
 
+updateEmployee = () => {
+    
+    connection.query('SELECT employee.last_name, role.title FROM employee JOIN role ON employee.role_id = role.id;', (err, res) => {
+        if(err) throw err
+        console.table(res)
 
-
-
-
-
-
-
-
-
+        inquirer.prompt([
+            {
+                name:'lastName',
+                type: 'rawlist',
+                message: "What is the employee's last name?",
+                choices: () => {
+                    let lastName = [];
+                    for(let i = 0; i < res.length; i++) {
+                        lastName.push(res[i].last_name);
+                    }
+                    return lastName;
+                },
+                
+            },
+            {
+                name:'role',
+                type: 'rawlist',
+                message: 'What is the employees new role? ',
+                choices: selectRole()
+            }
+        ]).then((answer) => {
+            let roleId = selectRole().indexOf(answer.role) +1
+            connection.query("UPDATE employee SET WHERE ?",
+            {
+                last_name: answer.lastName
+            },
+            {
+                role_id: roleId
+            },
+            function(err) {
+                if(err) throw err
+                console.table(answer)
+                startPrompt()
+            })
+        })
+    })
+}
 
 //=========ADD A NEW DEPARTMENT NAME===========//
 
@@ -240,10 +278,11 @@ addDepartment = () => {
         connection.query("INSERT INTO department SET ?",
         {
             name: res.name
+            //work out how to return the incremented ID
         },
         function(err) {
             if (err) throw err
-            console.table(res);
+            console.log('New Department added to the db \n')
             startPrompt();
         })
     })
