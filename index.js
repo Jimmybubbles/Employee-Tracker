@@ -3,6 +3,7 @@
 const mysql = require('mysql2');
 const inquirer = require("inquirer");
 const { start } = require('repl');
+const { connect } = require('http2');
 require('console.table');
 
 const connection = mysql.createConnection({
@@ -78,6 +79,9 @@ function startPrompt() {
             case "Update employee role":
                 updateEmployee();
                 break;
+            case "remove Employee":
+                removeEmployee();
+                break;
             case "Quit":
                 connection.end();
                 break;
@@ -137,6 +141,17 @@ selectManager = () => {
         }
     })
     return managerArr;
+}
+
+let employeelastnameArr = [];
+selectEmployee = () => {
+    connection.query('SELECT last_name FROM employee', (err, res) => {
+        if(err) throw err
+        for(let i = 0; i < res.length; i++) {
+            employeelastnameArr.push(res[i].last_name)
+        } 
+    })
+    return employeelastnameArr;
 }
 
 //================================================================//
@@ -222,48 +237,65 @@ addRole = () => {
 //=========================UPDATE EMPLOYEE WITH LAST NAME=============================//
 
 updateEmployee = () => {
-    
-    connection.query('SELECT employee.last_name, role.title FROM employee JOIN role ON employee.role_id = role.id;', (err, res) => {
-        if(err) throw err
-        console.table(res)
-
+        
         inquirer.prompt([
             {
                 name:'lastName',
-                type: 'rawlist',
-                message: "What is the employee's last name?",
-                choices: () => {
-                    let lastName = [];
-                    for(let i = 0; i < res.length; i++) {
-                        lastName.push(res[i].last_name);
-                    }
-                    return lastName;
-                },
+                type:'list',
+                message:"What is the employers last name?",
+                choices: selectEmployee()
                 
             },
+
             {
-                name:'role',
-                type: 'rawlist',
-                message: 'What is the employees new role? ',
-                choices: selectRole()
+                name:"role",
+                type:"list",
+                message:'What is the employees new role?',
+                choices: selectRole()            
             }
-        ]).then((answer) => {
-            let roleId = selectRole().indexOf(answer.role) +1
-            connection.query("UPDATE employee SET WHERE ?",
+
+        ]).then(function (answer) {
+            let lastName = selectEmployee().indexOf(answer.lastName) + 1
+            let roleId = selectRole().indexOf(answer.role) + 1;
+            
+            connection.query('UPDATE employee SET WHERE ?',
             {
-                last_name: answer.lastName
+                last_name: lastName,
+                role_Id: roleId
             },
-            {
-                role_id: roleId
-            },
+            
             function(err) {
                 if(err) throw err
                 console.table(answer)
                 startPrompt()
             })
         })
-    })
-}
+    }
+    
+
+// //CREATE TABLE employees (
+//     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+//     firstName VARCHAR (30),
+//     lastName VARCHAR (30),
+//     roleID INT,
+//     managerID INT
+//   );
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //=========ADD A NEW DEPARTMENT NAME===========//
 
@@ -287,3 +319,6 @@ addDepartment = () => {
         })
     })
 }
+
+
+
