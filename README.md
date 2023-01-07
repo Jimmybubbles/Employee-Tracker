@@ -39,4 +39,11 @@ you can write SOURCE then the path of the schema file in directory to create the
 
 once the database has has the schema file and seeds file loaded into it then you should be able to open a command prompt and run the index.js file. 
 
+## Screenshot
+![image](https://user-images.githubusercontent.com/110278837/211123696-c68c2def-c774-4a9a-bb80-700f48de3a12.png)
+
+## link to example
+
+https://drive.google.com/file/d/1gQ-0vUGo22kg9pr3m0lq2_qI4KhjgryX/view
+
 
